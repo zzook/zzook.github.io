@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Camera</title>
+</head>
+<body>
+    <input type="number" id="width" placeholder="width" value="1280">
+    <input type="number" id="height" placeholder="height" value="720">
+    <button id="save">Save</button>
+
+    <video id="video" width="640" height="480" autoplay></video>
+    <script>
+        let width;
+        let height;
+
+        if (localStorage.getItem("width") != null) {
+            width = parseInt(localStorage.getItem("width"));
+        } else {
+            width = 1280;
+        }
+
+        if (localStorage.getItem("height") != null) {
+            height = parseInt(localStorage.getItem("height"));
+        } else {
+            height = 720;
+        }
+
+        document.getElementById("video").width = width;
+        document.getElementById("video").height = height;
+
+        document.getElementById("save").addEventListener("click", () => {
+            localStorage.setItem("width", document.getElementById("width").value)
+            localStorage.setItem("height", document.getElementById("height").value)
+
+            document.getElementById("video").width = parseInt(document.getElementById("width").value);
+            document.getElementById("video").height = parseInt(document.getElementById("height").value);
+        });
+
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                document.getElementById("video").srcObject = stream;
+            })
+            .catch(err => console.error(err));
+    </script>
+</body>
+</html>
