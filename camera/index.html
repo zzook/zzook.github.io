@@ -6,15 +6,29 @@
     <title>Simple Camera</title>
 </head>
 <body>
-    <input type="number" id="deviceId" value="0" placeholder="device id">
-    <button id="save">Save</button>
-    <video id="video" width="1280" height="720" autoplay></video>
-    <button id="capture">Capture</button>
+    <center>
+        <input type="number" id="deviceId" value="0" placeholder="device id">
+        <button id="save">Save</button>
+        <video id="video" width="1280" height="720" autoplay></video>
+        <button id="capture">Capture</button>
 
-    <img id="captureImg">
+        <img id="captureImg">
+        <a id="download">Download</a>
+    </center>
 
     <script>
+        let devicesList;
+
+        navigator.mediaDevices.enumerateDevices().then(devices => {
+            devicesList = devices.filter(device => device.kind == "videoinput");
+        });
+
         document.getElementById("deviceId").value = localStorage.getItem("deviceId") ?? 0;
+
+        if (parseInt(document.getElementById("deviceId").value) >= devicesList.length) {
+            document.getElementById("deviceId").value = 0;
+            localStorage.setItem("deviceId", document.getElementById("deviceId").value);
+        }
 
         document.getElementById("save").addEventListener("click", () => {
             localStorage.setItem("deviceId", document.getElementById("deviceId").value);
@@ -22,23 +36,27 @@
         });
 
         document.getElementById("capture").addEventListener("click", () => {
-            const canvas = document.createElement('canvas');
+            let canvas = document.createElement('canvas');
             canvas.width = document.getElementById("video").videoWidth;
             canvas.height = document.getElementById("video").videoHeight;
 
-            const ctx = canvas.getContext('2d');
+            let ctx = canvas.getContext('2d');
             ctx.drawImage(document.getElementById("video"), 0, 0, canvas.width, canvas.height);
 
-            const dataURL = canvas.toDataURL('image/png');
+            let dataURL = canvas.toDataURL('image/png');
 
             document.getElementById("captureImg").src = dataURL;
+
+            document.getElementById("download").href = dataURL;
+            let date = new Date();
+            document.getElementById("download").download = date.toLocaleString() + ".png";
         });
 
         navigator.mediaDevices.getUserMedia({ video: {
             width: { ideal: 3840 },
             height: { ideal: 2160 },
             facingMode: { exact: "environment" },
-            deviceId: parseInt(document.getElementById("deviceId").value),
+            deviceId: deviceList[parseInt(document.getElementById("deviceId").value)],
         } })
             .then(stream => {
                 document.getElementById("video").srcObject = stream;
