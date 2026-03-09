@@ -7,8 +7,6 @@
 </head>
 <body>
     <center>
-        <input type="number" id="deviceId" value="0" placeholder="device id">
-        <button id="save">Save</button>
         <video id="video" width="1280" height="720" autoplay></video>
         <button id="capture">Capture</button>
 
@@ -17,24 +15,6 @@
     </center>
 
     <script>
-        let devicesList;
-
-        navigator.mediaDevices.enumerateDevices().then(devices => {
-            devicesList = devices.filter(device => device.kind == "videoinput");
-        });
-
-        document.getElementById("deviceId").value = localStorage.getItem("deviceId") ?? 0;
-
-        if (parseInt(document.getElementById("deviceId").value) >= devicesList.length) {
-            document.getElementById("deviceId").value = 0;
-            localStorage.setItem("deviceId", document.getElementById("deviceId").value);
-        }
-
-        document.getElementById("save").addEventListener("click", () => {
-            localStorage.setItem("deviceId", document.getElementById("deviceId").value);
-            location.reload();
-        });
-
         document.getElementById("capture").addEventListener("click", () => {
             let canvas = document.createElement('canvas');
             canvas.width = document.getElementById("video").videoWidth;
@@ -56,7 +36,6 @@
             width: { ideal: 3840 },
             height: { ideal: 2160 },
             facingMode: { exact: "environment" },
-            deviceId: deviceList[parseInt(document.getElementById("deviceId").value)],
         } })
             .then(stream => {
                 document.getElementById("video").srcObject = stream;
